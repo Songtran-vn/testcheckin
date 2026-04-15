@@ -174,7 +174,7 @@ async function doCheckin(){
     const data = await check.json();
 
     if(data.status === 'already'){
-      showResult('warning','⚠️', data.name, `Học viên đã check-in Ngày ${selectedDay} trước đó rồi!`);
+      showResult('success','🎉', data.name, `Bạn đã check-in Ngày ${selectedDay} trước đó rồi! Chúc bạn một ngày học tập hiệu quả! 🌟`);
     } else if(data.status === 'not_found'){
       showResult('error','❌','Không tìm thấy', 'Số điện thoại này chưa đăng ký. Vui lòng kiểm tra lại!');
     } else {

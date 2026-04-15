@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Check-in Học Viên</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a;--bg2:#121828;--bg3:#1a2235;--bg4:#222d42;
+  --border:rgba(255,255,255,.08);--border2:rgba(99,179,237,.3);
+  --text:#e8edf8;--muted:#7a8aaa;--muted2:#a0aec0;
+  --blue:#4a9ff5;--blue2:#2d7dd2;--green:#38c98a;--green2:#27a870;
+  --red:#f46a6a;--gold:#e8c84a;
+  --radius:16px;--radius-sm:10px;
+}
+body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+
+/* BG decoration */
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(74,159,245,.06) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(56,201,138,.05) 0%,transparent 60%);pointer-events:none}
+
+.wrap{width:100%;max-width:420px;position:relative}
+
+/* HEADER */
+.header{text-align:center;margin-bottom:32px}
+.header-icon{font-size:44px;margin-bottom:10px;display:block}
+.header h1{font-size:26px;font-weight:800;color:#fff;letter-spacing:-.02em;margin-bottom:6px}
+.header p{font-size:14px;color:var(--muted2)}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+
+/* INPUT */
+.input-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;display:block}
+.phone-input{width:100%;padding:16px 18px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:#fff;font-family:inherit;font-size:22px;font-weight:700;letter-spacing:.08em;text-align:center;transition:all .2s;-webkit-appearance:none}
+.phone-input:focus{outline:none;border-color:var(--blue);background:var(--bg4);box-shadow:0 0 0 3px rgba(74,159,245,.12)}
+.phone-input::placeholder{color:var(--muted);font-size:15px;font-weight:400;letter-spacing:0}
+
+/* DAY SELECTOR */
+.day-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.day-btn{padding:13px 10px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--bg3);color:var(--muted2);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.day-btn:hover{border-color:var(--blue);color:var(--blue)}
+.day-btn.active{background:var(--blue2);border-color:var(--blue);color:#fff;box-shadow:0 4px 14px rgba(74,159,245,.25)}
+
+/* SUBMIT */
+.submit-btn{width:100%;margin-top:20px;padding:16px;border-radius:var(--radius-sm);border:none;background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(56,201,138,.3)}
+.submit-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(56,201,138,.4)}
+.submit-btn:active{transform:translateY(0)}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* RESULT */
+.result{margin-top:20px;border-radius:var(--radius-sm);padding:24px;text-align:center;display:none}
+.result.success{background:rgba(56,201,138,.1);border:1px solid rgba(56,201,138,.3)}
+.result.error{background:rgba(244,106,106,.08);border:1px solid rgba(244,106,106,.25)}
+.result.warning{background:rgba(232,200,74,.08);border:1px solid rgba(232,200,74,.25)}
+.result-icon{font-size:40px;margin-bottom:10px}
+.result-name{font-size:20px;font-weight:800;color:#fff;margin-bottom:6px}
+.result-msg{font-size:13px;color:var(--muted2);line-height:1.6;margin-bottom:16px}
+.result-next{width:100%;padding:11px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg3);color:var(--muted2);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.result-next:hover{border-color:var(--border2);color:#fff}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.stat-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center}
+.stat-n{font-size:22px;font-weight:800;color:var(--blue)}
+.stat-n.green{color:var(--green)}
+.stat-l{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* SPINNER */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+
+/* ADMIN TOGGLE */
+.admin-link{text-align:center;margin-top:20px}
+.admin-link button{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit;text-decoration:underline}
+.admin-link button:hover{color:var(--muted2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <span class="header-icon">🎓</span>
+    <h1>Check-in Học Viên</h1>
+    <p>Nhập số điện thoại đã đăng ký</p>
+  </div>
+
+  <div class="card">
+    <label class="input-label">Số điện thoại</label>
+    <input class="phone-input" id="phone" type="tel" placeholder="0 9 0 0 0 0 0 0 0 0" maxlength="11" inputmode="numeric" oninput="onPhoneInput(this)" onkeydown="if(event.key==='Enter')doCheckin()">
+
+    <div class="day-row">
+      <button class="day-btn active" id="day1" onclick="selectDay(1)">📅 Ngày 1</button>
+      <button class="day-btn" id="day2" onclick="selectDay(2)">📅 Ngày 2</button>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="doCheckin()">
+      ✅ Xác nhận Check-in
+    </button>
+
+    <div class="result" id="result">
+      <div class="result-icon" id="result-icon"></div>
+      <div class="result-name" id="result-name"></div>
+      <div class="result-msg" id="result-msg"></div>
+      <button class="result-next" onclick="resetForm()">Check-in tiếp theo →</button>
+    </div>
+  </div>
+
+  <div class="stats" id="stats-row" style="display:none">
+    <div class="stat-box"><div class="stat-n" id="stat-d1">—</div><div class="stat-l">Ngày 1</div></div>
+    <div class="stat-box"><div class="stat-n green" id="stat-d2">—</div><div class="stat-l">Ngày 2</div></div>
+  </div>
+
+  <div class="admin-link">
+    <button onclick="loadStats()">📊 Xem thống kê</button>
+  </div>
+
+</div>
+
+<script>
+// ===== CẤU HÌNH =====
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpHAf4CHsgUydnTAzze68ezapKCLt8rGdxgEMrINM2KygGDf7TT69YTIaraXMI-uLP/exec';
+// ====================
+
+let selectedDay = 1;
+
+function onPhoneInput(el){
+  el.value = el.value.replace(/\D/g,'');
+}
+
+function selectDay(d){
+  selectedDay = d;
+  document.getElementById('day1').classList.toggle('active', d===1);
+  document.getElementById('day2').classList.toggle('active', d===2);
+}
+
+function showResult(type, icon, name, msg){
+  const r = document.getElementById('result');
+  r.className = 'result ' + type;
+  r.style.display = 'block';
+  document.getElementById('result-icon').textContent = icon;
+  document.getElementById('result-name').textContent = name;
+  document.getElementById('result-msg').textContent = msg;
+}
+
+function resetForm(){
+  document.getElementById('phone').value = '';
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('phone').focus();
+}
+
+async function doCheckin(){
+  const phone = document.getElementById('phone').value.trim();
+  if(phone.length < 9){
+    showResult('error','⚠️','Số điện thoại không hợp lệ','Vui lòng nhập đúng số điện thoại đã đăng ký.');
+    return;
+  }
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Đang xử lý...';
+
+  try{
+    const fd = new FormData();
+    fd.append('action','checkin');
+    fd.append('phone', phone);
+    fd.append('day', selectedDay);
+
+    const res = await fetch(SCRIPT_URL,{method:'POST',body:fd,mode:'no-cors'});
+    // no-cors → dùng polling để lấy kết quả
+    // Gửi GET để check kết quả
+    await new Promise(r=>setTimeout(r,1200));
+    const check = await fetch(`${SCRIPT_URL}?action=check&phone=${encodeURIComponent(phone)}&day=${selectedDay}`);
+    const data = await check.json();
+
+    if(data.status === 'already'){
+      showResult('warning','⚠️', data.name, `Học viên đã check-in Ngày ${selectedDay} trước đó rồi!`);
+    } else if(data.status === 'not_found'){
+      showResult('error','❌','Không tìm thấy', 'Số điện thoại này chưa đăng ký. Vui lòng kiểm tra lại!');
+    } else {
+      showResult('success','🎉', data.name, `Check-in Ngày ${selectedDay} thành công! Chào mừng bạn.`);
+    }
+  } catch(e){
+    showResult('error','❌','Lỗi kết nối','Không thể kết nối. Vui lòng thử lại!');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '✅ Xác nhận Check-in';
+}
+
+async function loadStats(){
+  document.getElementById('stats-row').style.display = 'grid';
+  document.getElementById('stat-d1').textContent = '...';
+  document.getElementById('stat-d2').textContent = '...';
+  try{
+    const res = await fetch(`${SCRIPT_URL}?action=stats`);
+    const data = await res.json();
+    document.getElementById('stat-d1').textContent = data.day1 ?? '0';
+    document.getElementById('stat-d2').textContent = data.day2 ?? '0';
+  } catch(e){
+    document.getElementById('stat-d1').textContent = '—';
+    document.getElementById('stat-d2').textContent = '—';
+  }
+}
+
+document.getElementById('phone').focus();
+</script>
+</body>
+</html>

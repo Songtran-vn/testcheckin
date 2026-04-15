@@ -178,7 +178,7 @@ async function doCheckin(){
     } else if(data.status === 'not_found'){
       showResult('error','❌','Không tìm thấy', 'Số điện thoại này chưa đăng ký. Vui lòng kiểm tra lại!');
     } else {
-      showResult('success','🎉', data.name, `Check-in Ngày ${selectedDay} thành công! Chào mừng bạn.`);
+      showResult('success','🎉', data.name, `Check-in Ngày ${selectedDay} thành công! Chúc bạn một ngày học tập hiệu quả! 🌟`);
     }
   } catch(e){
     showResult('error','❌','Lỗi kết nối','Không thể kết nối. Vui lòng thử lại!');

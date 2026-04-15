@@ -83,7 +83,10 @@ function getStats() {
 
 // ---- HELPERS ----
 function normalizePhone(p) {
-  return p.replace(/\D/g, '').replace(/^84/, '0');
+  p = p.replace(/\D/g, '');
+  if (p.startsWith('84')) p = '0' + p.slice(2);
+  if (!p.startsWith('0') && p.length === 9) p = '0' + p;
+  return p;
 }
 
 function json(obj) {

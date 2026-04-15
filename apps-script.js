@@ -4,14 +4,13 @@
 // Deploy as Web App: Execute as Me, Anyone can access
 // =====================================================
 
-// Cấu hình tên cột trong Google Sheet
 // Sheet "HocVien": STT | Họ Tên | Số Điện Thoại | Ngày 1 | Ngày 2
 // Sheet "Checkin":  Thời gian | Tên | SĐT | Ngày
 
 function doGet(e) {
   const action = e.parameter.action;
-  if (action === 'check')  return checkStatus(e);
-  if (action === 'stats')  return getStats();
+  if (action === 'check') return checkStatus(e);
+  if (action === 'stats') return getStats();
   return ContentService.createTextOutput('OK');
 }
 
@@ -23,7 +22,7 @@ function doPost(e) {
 
 // ---- CHECK-IN ----
 function doCheckin(e) {
-  const phone = normalizePhone(e.parameter.phone || '');
+  const phone = e.parameter.phone || '';
   const day   = parseInt(e.parameter.day) || 1;
   const ss    = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName('HocVien');
@@ -31,16 +30,13 @@ function doCheckin(e) {
 
   if (!sheet) return json({status:'error', msg:'Không tìm thấy sheet HocVien'});
 
-  const data  = sheet.getDataRange().getValues();
-  // Cột: 0=STT, 1=Tên, 2=SĐT, 3=Ngày1, 4=Ngày2
+  const data = sheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
-    const rowPhone = normalizePhone(String(data[i][2]));
-    if (rowPhone === phone) {
-      const colDay = day === 1 ? 3 : 4; // cột Ngày 1 hoặc Ngày 2
+    if (samePhone(phone, String(data[i][2]))) {
+      const colDay = day === 1 ? 3 : 4;
       if (data[i][colDay] === '✓') {
         return json({status:'already', name: data[i][1]});
       }
-      // Ghi check-in
       sheet.getRange(i + 1, colDay + 1).setValue('✓');
       if (log) log.appendRow([new Date(), data[i][1], phone, 'Ngày ' + day]);
       return json({status:'ok', name: data[i][1]});
@@ -51,18 +47,16 @@ function doCheckin(e) {
 
 // ---- CHECK TRẠNG THÁI (GET) ----
 function checkStatus(e) {
-  const phone = normalizePhone(e.parameter.phone || '');
+  const phone = e.parameter.phone || '';
   const day   = parseInt(e.parameter.day) || 1;
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('HocVien');
   if (!sheet) return json({status:'error'});
 
   const data = sheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
-    const rowPhone = normalizePhone(String(data[i][2]));
-    if (rowPhone === phone) {
+    if (samePhone(phone, String(data[i][2]))) {
       const colDay = day === 1 ? 3 : 4;
-      const checked = data[i][colDay] === '✓';
-      return json({status: checked ? 'already' : 'ok', name: data[i][1]});
+      return json({status: data[i][colDay] === '✓' ? 'already' : 'ok', name: data[i][1]});
     }
   }
   return json({status:'not_found'});
@@ -82,11 +76,20 @@ function getStats() {
 }
 
 // ---- HELPERS ----
-function normalizePhone(p) {
+
+// Bỏ tất cả ký tự không phải số, bỏ đầu 84 hoặc 0 → lấy 9 số cuối
+function stripPhone(p) {
   p = p.replace(/\D/g, '');
-  if (p.startsWith('84')) p = '0' + p.slice(2);
-  if (!p.startsWith('0') && p.length === 9) p = '0' + p;
+  if (p.startsWith('84')) p = p.slice(2);
+  if (p.startsWith('0'))  p = p.slice(1);
   return p;
+}
+
+// So sánh 2 SĐT bất kể có số 0 đầu hay không
+function samePhone(a, b) {
+  const sa = stripPhone(a);
+  const sb = stripPhone(b);
+  return sa.length >= 9 && sb.length >= 9 && sa === sb;
 }
 
 function json(obj) {
